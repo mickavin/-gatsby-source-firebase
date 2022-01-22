@@ -2,7 +2,7 @@ const firebase = require("firebase-admin")
 const crypto = require("crypto")
 
 exports.sourceNodes = (
-  { actions },
+  { actions, createNodeId, createContentDigest },
   { credential, databaseURL, types, quiet = false },
   done
 ) => {
