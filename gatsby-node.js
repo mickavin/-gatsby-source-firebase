@@ -50,6 +50,7 @@ exports.sourceNodes = (
       })
       createNode(nodeData)
     })
+    done()
   })
 }
 
