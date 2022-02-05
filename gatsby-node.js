@@ -1,9 +1,10 @@
 const firebase = require("firebase-admin")
 const crypto = require("crypto")
+const { getAppCheck } = require("firebase-admin/app-check");
 
 exports.sourceNodes = (
   { actions, createNodeId, createContentDigest },
-  { credential, databaseURL, types, token, quiet = false },
+  { credential, databaseURL, types, quiet = false },
   done
 ) => {
   const { createNode } = actions
@@ -11,18 +12,7 @@ exports.sourceNodes = (
     credential: firebase.credential.cert(credential),
     databaseURL
   })
-  
-  const verifyAppCheckToken = async (appCheckToken) => {
-    if (!appCheckToken) {
-      return null;
-    }
-    try {
-      return firebase.appCheck().verifyToken(appCheckToken);
-    } catch (err) {
-      return null;
-    }
-  };
-  
+  getAppCheck()
   const processResultFirebase = ({ result, endpoint, prefix }) => {
     if (result.fields !== result.newFields) {
       Object.defineProperty(result, "newFields",
@@ -45,7 +35,7 @@ exports.sourceNodes = (
 
     return nodeData
   }
-  verifyAppCheckToken(token)
+
   const db = firebase.database()
   
   db.ref("events").orderByChild('isPublished').equalTo(true).once("value", snapshot => {
