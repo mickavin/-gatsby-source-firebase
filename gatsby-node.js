@@ -3,7 +3,7 @@ const crypto = require("crypto")
 
 exports.sourceNodes = (
   { actions, createNodeId, createContentDigest },
-  { credential, databaseURL, types, quiet = false },
+  { credential, databaseURL, types, token, quiet = false },
   done
 ) => {
   const { createNode } = actions
@@ -11,6 +11,17 @@ exports.sourceNodes = (
     credential: firebase.credential.cert(credential),
     databaseURL
   })
+  
+  const verifyAppCheckToken = async (appCheckToken) => {
+    if (!appCheckToken) {
+      return null;
+    }
+    try {
+      return firebase.appCheck().verifyToken(appCheckToken);
+    } catch (err) {
+      return null;
+    }
+  };
   
   const processResultFirebase = ({ result, endpoint, prefix }) => {
     if (result.fields !== result.newFields) {
@@ -34,7 +45,7 @@ exports.sourceNodes = (
 
     return nodeData
   }
-
+  verifyAppCheckToken(token)
   const db = firebase.database()
   
   db.ref("events").orderByChild('isPublished').equalTo(true).once("value", snapshot => {
